@@ -1,6 +1,10 @@
 # Main Dynamic Makefile
 
-DEBUG := 3## Set to any value to include extra debug information in the output. Note, only a blank value will turn off DEBUG.
+DEBUG := ## Set to any value to include extra debug information in the output. Note, only a blank value will turn off DEBUG.
+
+# If you do not specify a <target> assume you need help.
+
+.DEFAULT_GOAL := help
 
 # Variables - Add any custom variable you want available here.
 
