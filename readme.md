@@ -8,7 +8,7 @@ This project provides a dynamic Makefile system designed to organize and extend 
 - **Dynamic Target Loading:** Automatically discovers and includes targets defined in `.mk` files within the `makefiler/` directory. This modular approach keeps your build logic organized and easy to manage.
 - **Help Target (`make help`):** Provides a self-documenting system. Running `make help` will list all available targets and their descriptions, which are extracted directly from your `.mk` files.
 - **Target File Dumping (`make dump target=<target>`):** The `dump` target is a utility for inspecting the contents of individual `.mk` target files. This is useful for debugging or understanding the definition of a specific target.
-- **Optional Variable Overrides:** Allows for customization of Makefile variables through an optional `Makefile.variables` file. This lets you tailor the build process without directly modifying the core `Makefile` or target definitions.
+- **Optional Variable Overrides:** Allows for customization of variables intended for use within your targets through an optional `Makefile.variables` file. This lets you tailor the build process without directly modifying the core target definitions.
 - **Debug Mode:** A `DEBUG` variable can be enabled to output extra debug information during `make` execution, aiding in troubleshooting and understanding the Makefile's behavior.
 
 ## Usage
@@ -58,22 +58,40 @@ This project provides a dynamic Makefile system designed to organize and extend 
 
 ## Customizing Variables with `Makefile.variables` (Optional)
 
-You can customize certain variables used in the `Makefile` system without directly modifying the main `Makefile`.
+You can customize variables that are **intended to be used within your target definitions in the `.mk` files** (located in the `makefiler/` directory) using an optional `Makefile.variables` file. This allows you to tailor the behavior of your build targets without needing to modify the `.mk` files directly, promoting reusability and configuration flexibility.
 
 1.  **Create `Makefile.variables`:** In the same directory as the main `Makefile`, create a file named `Makefile.variables`.
 
-2.  **Define Variables:** Inside `Makefile.variables`, define any variables you want to override. For example:
+2.  **Define Variables:** Inside `Makefile.variables`, define any variables you want to customize. These variables will then be available for use within your `.mk` target files. For example, if your `build.mk` file in `makefiler/` uses variables like `BACKEND_BUILD_COMMAND` and `DEPLOY_SERVER_ADDRESS`, you can customize them in `Makefile.variables`:
 
     ```makefile
     # Makefile.variables
 
-    BACKEND_DIR = custom_backend_path
-    CONTAINER_PHP = docker-compose exec app php
+    BACKEND_BUILD_COMMAND = docker-compose -f docker-compose.backend.yml build
+    DEPLOY_SERVER_ADDRESS = my-production-server.example.com
     ```
 
-    These variables defined in `Makefile.variables` will take precedence over any default variables defined in the main `Makefile`.
+3.  **Usage in `.mk` Files:** In your `.mk` files, you can now use these variables, and their values will be dynamically set based on whether `Makefile.variables` exists and what it contains.
 
-3.  **Run `make`:** The `Makefile` will automatically include `Makefile.variables` if it exists, applying your custom variable settings. If `Makefile.variables` does not exist, the default variables in the main `Makefile` will be used.
+    ```makefile
+    # makefiler/build.mk
+
+    build-backend: # Build the backend application using custom command.
+    	@echo "Building backend using: $(BACKEND_BUILD_COMMAND)"
+    	@$(BACKEND_BUILD_COMMAND)
+
+    deploy-backend: # Deploy backend to custom server address.
+    	@echo "Deploying backend to: $(DEPLOY_SERVER_ADDRESS)"
+    	@# ... deployment commands using $(DEPLOY_SERVER_ADDRESS) ...
+    ```
+
+4.  **Run `make`:** The `Makefile` will automatically include `Makefile.variables` if it exists, applying your custom variable settings when processing the `.mk` target files. If `Makefile.variables` does not exist, the default (or initially defined) variable values will be used in your `.mk` files.
+
+**Important Notes:**
+
+- **Do Not Modify the Main `Makefile` Directly:** The `Makefile` program itself is designed to provide the core dynamic loading and help system. **End-users are strongly discouraged from modifying the main `Makefile` file.** Customization and extension of the build process should primarily be achieved by creating and modifying `.mk` files within the `makefiler/` directory and by using the optional `Makefile.variables` file for variable overrides. Directly altering the main `Makefile` can lead to unexpected behavior, break the dynamic loading mechanism, and make future updates or maintenance more difficult.
+
+- **`Makefile.variables` Scope:** The `Makefile.variables` file is intended for customizing variables that are _used by your targets defined in the `.mk` files_. While technically variables defined in `Makefile.variables` will override any similarly named variables in the main `Makefile` _if defined before the `-include` statement_, **the main `Makefile` itself is designed to be largely static and should not typically require end-user modification.** Customization should primarily happen through the `.mk` files and the optional `Makefile.variables` file to maintain the structure and integrity of the `Makefiler` system.
 
 ## Debug Mode
 
@@ -91,7 +109,7 @@ Currently, debug mode outputs information about the discovered phony targets. Yo
 ## Directory Structure
 
 - **`Makefile`**: The main dynamic Makefile.
-- **`Makefile.variables` (optional)**: File for overriding default variables.
+- **`Makefile.variables` (optional)**: File for overriding global user variables.
 - **`makefiler/`**: Directory containing `.mk` files, each defining a set of related targets.
 
 ## Contributing
@@ -100,8 +118,4 @@ Contributions to improve `Makefiler` are welcome! Please feel free to submit pul
 
 ---
 
-This `README.md` provides a comprehensive overview of the `Makefiler` system, making it easier for users to understand, use, and extend its functionality for their projects.
-
-```
-
-```
+This `README.md` provides a "relatively" comprehensive overview of the `Makefiler` system, making it easier for users to understand, use, and extend its functionality for their projects.
