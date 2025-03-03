@@ -1,4 +1,3 @@
-````markdown
 # Makefiler: Dynamic Makefile System
 
 This project provides a dynamic Makefile system designed to organize and extend your build processes. Instead of a single monolithic Makefile, `Makefiler` allows you to define targets and logic in separate, modular `.mk` files, making your build system more maintainable and scalable.
@@ -25,12 +24,12 @@ This project provides a dynamic Makefile system designed to organize and extend 
     # makefiler/build.mk
 
     build: # Compile the application.
-    	@echo "Building application..."
-    	# ... your build commands ...
+        @echo "Building application..."
+        # ... your build commands ...
 
     build-docker: # Build a Docker image.
-    	@echo "Building Docker image..."
-    	# ... your docker build commands ...
+        @echo "Building Docker image..."
+        # ... your docker build commands ...
     ```
 
 3.  **Run `make <target>`:** From your project's root directory, execute `make` followed by the name of the target you want to run.
@@ -77,12 +76,12 @@ You can customize variables that are **intended to be used within your target de
     # makefiler/build.mk
 
     build-backend: # Build the backend application using custom command.
-    	@echo "Building backend using: $(BACKEND_BUILD_COMMAND)"
-    	@$(BACKEND_BUILD_COMMAND)
+        @echo "Building backend using: $(BACKEND_BUILD_COMMAND)"
+        @$(BACKEND_BUILD_COMMAND)
 
     deploy-backend: # Deploy backend to custom server address.
-    	@echo "Deploying backend to: $(DEPLOY_SERVER_ADDRESS)"
-    	@# ... deployment commands using $(DEPLOY_SERVER_ADDRESS) ...
+        @echo "Deploying backend to: $(DEPLOY_SERVER_ADDRESS)"
+        @# ... deployment commands using $(DEPLOY_SERVER_ADDRESS) ...
     ```
 
 4.  **Run `make`:** The `Makefile` will automatically include `Makefile.variables` if it exists, applying your custom variable settings when processing the `.mk` target files. If `Makefile.variables` does not exist, the default (or initially defined) variable values will be used in your `.mk` files.
@@ -102,7 +101,6 @@ For example, to enable debug mode when running `make help`:
 ```bash
 DEBUG=1 make help
 ```
-````
 
 Currently, debug mode outputs information about the discovered phony targets. You can extend the debug output by adding `$(if $(DEBUG),$(info ...))` statements in your `.mk` files or the main `Makefile` to trace variable values or execution flow.
 
