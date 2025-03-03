@@ -34,13 +34,13 @@ help: # Display this message.
 	@echo ""
 	@echo "Targets:"
 	@echo ""
-	@printf "  \033[36m%-15s\033[0m %s\n" help "Display this message"; \
+	@printf "  \033[36m%-20s\033[0m %s\n" help "     Display this message"; \
 	for file in $(wildcard $(MAKEFILES_DIR)/*.mk); do \
 		grep -E '^[a-zA-Z_-]+: #' "$$file" | while read -r line; do \
 			target=$$(echo $$line | cut -d':' -f1); \
 			help=$$(echo $$line | sed 's/^[a-zA-Z_-]\+: # //'); \
 			if [ "$$help" != "" ]; then \
-				printf "  \033[36m%-15s\033[0m %s\n" $$target "$$help"; \
+				printf "  \033[36m%-20s\033[0m %s\n" $$target "     $$help"; \
 			fi; \
 		done; \
 	done
@@ -61,4 +61,3 @@ dump: ## Output an ancillary make file from makefile$(MAKEFILES_DIR)/<target>.mk
 		echo "Target $$target.mk file not found in $(MAKEFILES_DIR)/"; \
 		echo ""; \
 	fi
-
