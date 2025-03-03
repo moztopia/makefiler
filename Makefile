@@ -6,15 +6,13 @@ DEBUG := ## Set to any value to include extra debug information in the output. N
 
 .DEFAULT_GOAL := help
 
-# Variables - Add any custom variable you want available here.
+# Optional variables from Makefile.variables - will override defaults above if defined
 
-BACKEND_DIR = backend
-FRONTEND_DIR = frontend
-CONTAINER_PHP = php
+-include Makefile.variables
 
 # System Variables
 
-MAKEFILES_DIR=makefiles
+MAKEFILES_DIR=makefiler
 
 # Dynamically create the .PHONY list
 
