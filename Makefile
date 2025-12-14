@@ -9,6 +9,9 @@ DEBUG := ## Set to any value to include extra debug information in the output. N
 # Optional variables from Makefile.variables - will override defaults above if defined
 
 -include Makefile.variables
+Makefile.variables:
+	@:
+
 
 # System Variables
 
@@ -27,7 +30,23 @@ $(if $(DEBUG),$(info PHONY TARGETS: $(PHONY_TARGETS))) ## DEBUG PHONY_TARGETS
 
 include $(wildcard $(MAKEFILES_DIR)/*.mk)
 
-# The targets below are system functions.
+# Extract all targets from .mk files (lines starting with 'target:')
+ALL_MK_TARGETS := $(shell grep -h -E '^[a-zA-Z0-9_-]+:' $(MAKEFILES_DIR)/*.mk | cut -d: -f1)
+KNOWN_TARGETS := $(PHONY_TARGETS) $(ALL_MK_TARGETS)
+
+# Global catch-all to handle arguments vs typos
+# If the current target ($@) is NOT in KNOWN_TARGETS, we check if ANY valid target was passed.
+# If NO valid target is present in MAKECMDGOALS, then this is likely a typo -> Error.
+# If at least ONE valid target is present, then this ($@) is likely an argument -> Ignore.
+%:
+	@if [ -z "$(filter $(KNOWN_TARGETS),$(MAKECMDGOALS))" ]; then \
+		echo ""; \
+		printf "\033[31mError: No rule to make target '$@'\033[0m\n"; \
+		echo ""; \
+		$(MAKE) -s help; \
+		exit 1; \
+	fi
+
 
 help: # Display this message.
 	@echo "Usage: make <target>"
