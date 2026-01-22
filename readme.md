@@ -1,6 +1,10 @@
-# Makefiler: Dynamic Makefile System
+# Makefiler
+![Test Status](https://github.com/moztopia/makefiler/actions/workflows/test.yml/badge.svg)
 
-This project provides a dynamic Makefile system designed to organize and extend your build processes. Instead of a single monolithic Makefile, **Makefiler** allows you to define targets and logic in separate, modular `.mk` files, making your build system more maintainable and scalable.
+> **Note:** Full documentation is available in the [Wiki](https://github.com/moztopia/makefiler/wiki).
+
+**Dynamic, self-documenting Makefile system for modern projects.**
+ provides a dynamic Makefile system designed to organize and extend your build processes. Instead of a single monolithic Makefile, **Makefiler** allows you to define targets and logic in separate, modular `.mk` files, making your build system more maintainable and scalable.
 
 ## Key Features
 
@@ -10,18 +14,24 @@ This project provides a dynamic Makefile system designed to organize and extend 
 - **Optional Variable Overrides:** Customize variables used in your targets via an optional `Makefile.variables` file. This allows you to tailor the build process without modifying the core target definitions.
 - **Debug Mode:** Enable debug output by setting the `DEBUG` variable. This outputs extra debug information during make execution, which aids troubleshooting and helps you understand the Makefile’s behavior.
 
-## Installation Process
+## Installation
 
-1. **Clone Makefiler:**  
-   Clone the Makefiler repository into your local workspace.
+The easiest way to install Makefiler in your project is using the installer script:
 
-   ```bash
-   git clone https://github.com/yourusername/makefiler.git
-   ```
+```bash
+# Install to current directory
+curl -sL https://raw.githubusercontent.com/moztopia/makefiler/main/install.sh | bash
 
-2. **Copy the Required Files:**
+# Or install to a specific path
+curl -sL https://raw.githubusercontent.com/moztopia/makefiler/main/install.sh | bash -s -- /path/to/project
 
-   - Copy the **main `Makefile`** from the Makefiler repository into the root of your project.
+# Or use the single-file Python installer (no git required)
+# Download makefiler_installer.py from Releases and run:
+python3 makefiler_installer.py
+```
+
+Alternatively, you can clone the repository manually:
+** from the Makefiler repository into the root of your project.
    - Copy the **`makefiler/` folder** into your project’s root directory.
 
    This setup installs the dynamic Makefiler system into your project, setting the stage for modular target definitions.

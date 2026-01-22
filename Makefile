@@ -1,43 +1,32 @@
 # Main Dynamic Makefile
+VERSION := 0.0.9
+
+
 
 DEBUG := ## Set to any value to include extra debug information in the output. Note, only a blank value will turn off DEBUG.
 
-# If you do not specify a <target> assume you need help.
+# Define the directory where the makefiles are located
+MAKEFILES_DIR := makefiler
 
-.DEFAULT_GOAL := help
-
-# Optional variables from Makefile.variables - will override defaults above if defined
-
+# Check if Makefile.variables exists and include it if it does
 -include Makefile.variables
-Makefile.variables:
-	@:
 
-
-# System Variables
-
-MAKEFILES_DIR=makefiler
-
-# Dynamically create the .PHONY list
-
+# Define PHONY targets dynamically from .mk files
 PHONY_TARGETS := $(basename $(notdir $(wildcard $(MAKEFILES_DIR)/*.mk)))
 PHONY_TARGETS += dump help
 
-$(if $(DEBUG),$(info PHONY TARGETS: $(PHONY_TARGETS))) ## DEBUG PHONY_TARGETS
-
 .PHONY: $(PHONY_TARGETS)
 
-# Include all .mk files from the $(MAKEFILES_DIR)/*.mk source folder.
-
+# Include all .mk files from the makefiles directory
 include $(wildcard $(MAKEFILES_DIR)/*.mk)
 
-# Extract all targets from .mk files (lines starting with 'target:')
+# Define known targets dynamically
 ALL_MK_TARGETS := $(shell grep -h -E '^[a-zA-Z0-9_-]+:' $(MAKEFILES_DIR)/*.mk | cut -d: -f1)
 KNOWN_TARGETS := $(PHONY_TARGETS) $(ALL_MK_TARGETS)
 
-# Global catch-all to handle arguments vs typos
-# If the current target ($@) is NOT in KNOWN_TARGETS, we check if ANY valid target was passed.
-# If NO valid target is present in MAKECMDGOALS, then this is likely a typo -> Error.
-# If at least ONE valid target is present, then this ($@) is likely an argument -> Ignore.
+# Empty rule for Makefile.variables to prevent it from being caught by the catch-all
+Makefile.variables:
+
 %:
 	@if [ -z "$(filter $(KNOWN_TARGETS),$(MAKECMDGOALS))" ]; then \
 		echo ""; \
@@ -47,8 +36,12 @@ KNOWN_TARGETS := $(PHONY_TARGETS) $(ALL_MK_TARGETS)
 		exit 1; \
 	fi
 
+dump: # Dump the contents of all included makefiles.
+	@echo "Dumping included makefiles:"
+	@cat $(wildcard $(MAKEFILES_DIR)/*.mk)
 
 help: # Display this message.
+	@echo "Makefiler v$(VERSION)"
 	@echo "Usage: make <target>"
 	@echo ""
 	@echo "Targets:"
@@ -63,20 +56,3 @@ help: # Display this message.
 			fi; \
 		done; \
 	done
-	@echo ""
-
-dump: ## Output an ancillary make file from makefile$(MAKEFILES_DIR)/<target>.mk
-	@if [ -z "$(target)" ]; then \
-		echo ""; \
-		echo "Usage: make sys-dump target=<target>"; \
-		echo ""; \
-		exit 1; \
-	fi
-	@file="$(MAKEFILES_DIR)/$(target).mk"; \
-	if [ -f "$$file" ]; then \
-		cat "$$file"; \
-	else \
-		echo ""; \
-		echo "Target $$target.mk file not found in $(MAKEFILES_DIR)/"; \
-		echo ""; \
-	fi
